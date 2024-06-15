@@ -1,17 +1,11 @@
 package main
 
 import (
-	"log"
-
-	"github.com/chex0v/yt-time-tracker/internal/config"
+	"github.com/chex0v/yt-time-tracker/cmd"
 )
 
 func main() {
 
-	log.Print("Load config")
-
-	cfg := config.GetConfig()
-
-	log.Print(cfg)
+	cmd.Execute()
 
 }
