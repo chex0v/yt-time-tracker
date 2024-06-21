@@ -9,6 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	task string
+)
 var rootCmd = &cobra.Command{
 	Use:   "ytt",
 	Short: "Для работы с yt",
@@ -23,9 +26,11 @@ func Execute() {
 }
 
 func addCommands() {
+	cmd := trackingtypes.TrackingTypesCmd
 	rootCmd.AddCommand(add.AddCmd)
 	rootCmd.AddCommand(taskInfo.TaskInfoCmd)
 	rootCmd.AddCommand(trackingtypes.TrackingTypesCmd)
+	cmd.Flags().StringVarP(&task, "task", "t", "", "Task number")
 }
 func init() {
 	addCommands()
