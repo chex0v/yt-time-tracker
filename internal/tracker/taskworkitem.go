@@ -3,9 +3,11 @@ package tracker
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/chex0v/yt-time-tracker/internal/config"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 const (
@@ -22,12 +24,30 @@ type Duration struct {
 }
 
 type WorkItem struct {
-	Duration Duration `json:"duration"`
-	Date     int64    `json:"date"`
-	Created  int64    `json:"created"`
-	Creator  User     `json:"creator"`
-	Author   User     `json:"author"`
-	Id       string   `json:"id"`
+	Duration    Duration `json:"duration"`
+	Date        int64    `json:"date"`
+	Created     int64    `json:"created"`
+	Creator     User     `json:"creator"`
+	Author      User     `json:"author"`
+	Id          string   `json:"id"`
+	TextPreview string   `json:"textPreview,omitempty"`
+	Text        string   `json:"text,omitempty"`
+	Issue       Issue    `json:"issue"`
+}
+
+type Issue struct {
+	ID         string `json:"id"`
+	Summary    string `json:"summary"`
+	IdReadable string `json:"idReadable"`
+}
+
+func (i Issue) Link() string {
+	c := config.GetConfig()
+	u, err := url.Parse(c.ApiUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fmt.Sprintf("%s://%s/issue/%s/", u.Scheme, u.Host, i.IdReadable)
 }
 
 func (c Client) TaskTackerInfo(taskNumber string) (WorkItems, error) {

@@ -21,7 +21,7 @@ func (c Client) MyWorkItemByDate(date string) ([]WorkItem, error) {
 		log.Fatal(err)
 	}
 
-	url := c.Url + WorkItemsPath + fmt.Sprintf("?startDate=%s&endDate=%s&author=%s&fields=id,author(id,name),creator(id,name),created,date,duration(minutes,presentation)", date, date, u.Id)
+	url := c.Url + WorkItemsPath + fmt.Sprintf("?startDate=%s&endDate=%s&author=%s&fields=id,author(id,name),creator(id,name),created,date,duration(minutes,presentation),text,issue(id,summary,idReadable)", date, date, u.Id)
 	req, err := http.NewRequest("GET", url, nil)
 
 	req.Header.Add("Authorization", c.headerToken())
