@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TaskTrackerUrlInfo = "/timeTracking?fields=draftWorkItem(id),enabled,workItems(created,duration(presentation,minutes),author(name),creator(name),date,id)"
+	TaskTrackerUrlInfo = "/timeTracking?fields=draftWorkItem(id),enabled,workItems(created,duration(presentation,minutes),author(name),creator(name),date,id,text)"
 )
 
 type WorkItems struct {

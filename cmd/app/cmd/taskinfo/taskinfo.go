@@ -67,7 +67,7 @@ func taskInfo(cmd *cobra.Command, args []string) error {
 		tm := time.Unix(d/1000, 0)
 		t.AddLine("Дата: ", tm.Format(time.DateOnly), "")
 		for _, item := range groupByData[d] {
-			t.AddLine(item.Id, item.Author.Name, item.Duration.Presentation)
+			t.AddLine(item.Id, item.Author.Name, item.Duration.Presentation, item.Text)
 		}
 	}
 	s.Stop()
