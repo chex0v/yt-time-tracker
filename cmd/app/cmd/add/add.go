@@ -7,16 +7,14 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"log"
-	"strconv"
 )
 
 var AddCmd = &cobra.Command{
-	Use:   "add [task] [date] [time] [message]",
+	Use:   "add [task] [time] [message]",
 	Short: "Добавить время в задачу",
 	Long: `
 	Добавляет время в задачу с номером или по шаблону.
 	Задача(task) описывается как часть URL строки, например VUZ-01.
-	Дата(date) описывается в формате d.m.Y, если год опускается берётся текущий.
 	Время(time) берётся в формате для YT, например 12h1m.
 	Сообщение(message) комментарий к времени
 	`,
@@ -27,7 +25,7 @@ func viewTaskTypes(types []tracker.WorkItemType) (tracker.WorkItemType, error) {
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . | red }}",
-		Active:   "\U0001F336 {{ .Id }} ({{ .Name }})",
+		Active:   "\U0001F32D {{ .Id }} ({{ .Name }})",
 		Inactive: "  {{ .Id }} ({{ .Name }})",
 		Selected: "\U0001F336 {{ .Id | red | cyan }} {{ .Name }}",
 		Details: `
@@ -52,21 +50,16 @@ func viewTaskTypes(types []tracker.WorkItemType) (tracker.WorkItemType, error) {
 }
 
 func addTime(cmd *cobra.Command, args []string) error {
-	if len(args) < 4 {
-		return fmt.Errorf("Argument must be %d", 4)
+	if len(args) < 3 {
+		return fmt.Errorf("Argument must be %d", 3)
 	}
 
 	taskNumber := args[0]
-	date := args[1]
-	t := args[2]
-	message := args[3]
-	fmt.Println(date)
+	t := args[1]
+	message := args[2]
 
-	timeValue, err := strconv.Atoi(t)
+	timeValue := t
 
-	if err != nil {
-		log.Fatalln(err)
-	}
 	config := config.GetConfig()
 
 	clientTracker := tracker.NewClient(config.ApiUrl, config.Token)
@@ -79,14 +72,19 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	typeTask, err := viewTaskTypes(types)
 
-	create := tracker.WorkItemCreate{Text: message, Duration: tracker.Duration{Minutes: timeValue}, Type: tracker.TypeDuration{Id: typeTask.Id}}
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	_, err = clientTracker.TaskAdd(taskNumber, create)
+	create := tracker.WorkItemCreate{Text: message, Duration: tracker.Duration{Presentation: timeValue}, Type: tracker.TypeDuration{Id: typeTask.Id}}
+
+	wItem := tracker.WorkItem{}
+	wItem, err = clientTracker.WorkItemAdd(taskNumber, create)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Время добавлено")
+	fmt.Printf("Время добавлено. id: %s", wItem.Id)
 	return nil
 }

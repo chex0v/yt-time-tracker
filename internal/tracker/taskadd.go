@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"io"
 	"log"
 	"net/http"
@@ -22,29 +23,31 @@ type WorkItemCreate struct {
 	Type     TypeDuration `json:"type"`
 }
 
-func (c Client) TaskAdd(taskNumber string, taskAdd WorkItemCreate) (TaskInfo, error) {
+func (c Client) WorkItemAdd(taskNumber string, taskAdd WorkItemCreate) (WorkItem, error) {
 
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(taskAdd)
 	if err != nil {
-		return TaskInfo{}, err
+		return WorkItem{}, err
 	}
 
 	req, err := http.NewRequest("POST", c.Url+fmt.Sprintf(AddTracker, taskNumber), payloadBuf)
 
 	if err != nil {
-		return TaskInfo{}, err
+		return WorkItem{}, err
 	}
 
 	req.Header = http.Header{
 		"Content-Type":  {"application/json"},
 		"Authorization": {c.headerToken()},
 	}
-
+	s := progressbar.NewProgressBar()
+	s.Start()
 	res, err := c.HTTPClient.Do(req)
+	s.Stop()
 
 	if err != nil {
-		return TaskInfo{}, err
+		return WorkItem{}, err
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -55,21 +58,21 @@ func (c Client) TaskAdd(taskNumber string, taskAdd WorkItemCreate) (TaskInfo, er
 	}(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		return TaskInfo{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return WorkItem{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return TaskInfo{}, err
+		return WorkItem{}, err
 	}
 
-	target := TaskInfo{}
+	target := WorkItem{}
 
 	err = json.Unmarshal(body, &target)
 
 	if err != nil {
-		return TaskInfo{}, err
+		return WorkItem{}, err
 	}
 
-	return TaskInfo{}, nil
+	return target, nil
 }

@@ -1,16 +1,18 @@
 package cmd
 
 import (
-	"os"
-
-	add "github.com/chex0v/yt-time-tracker/cmd/app/cmd/add"
+	"github.com/chex0v/yt-time-tracker/cmd/app/cmd/add"
+	"github.com/chex0v/yt-time-tracker/cmd/app/cmd/report"
 	taskInfo "github.com/chex0v/yt-time-tracker/cmd/app/cmd/taskinfo"
-	trackingtypes "github.com/chex0v/yt-time-tracker/cmd/app/cmd/trackingtypes"
+	"github.com/chex0v/yt-time-tracker/cmd/app/cmd/trackingtypes"
+	"github.com/chex0v/yt-time-tracker/cmd/app/cmd/user"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var (
 	task string
+	date string
 )
 var rootCmd = &cobra.Command{
 	Use:   "ytt",
@@ -27,10 +29,14 @@ func Execute() {
 
 func addCommands() {
 	cmd := trackingtypes.TrackingTypesCmd
+	reportCmd := report.MyReportByTodayCmd
 	rootCmd.AddCommand(add.AddCmd)
 	rootCmd.AddCommand(taskInfo.TaskInfoCmd)
 	rootCmd.AddCommand(trackingtypes.TrackingTypesCmd)
+	rootCmd.AddCommand(user.MyUserInfoCmd)
+	rootCmd.AddCommand(reportCmd)
 	cmd.Flags().StringVarP(&task, "task", "t", "", "Task number")
+	reportCmd.Flags().StringVarP(&date, "date", "d", "", "Date of report. Format YYYY-MM-DD")
 }
 func init() {
 	addCommands()

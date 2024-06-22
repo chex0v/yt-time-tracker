@@ -29,7 +29,7 @@ func GetConfig() *Config {
 			if _, err := os.Stat(homeDir + "/.yttrc/config.yaml"); errors.Is(err, os.ErrNotExist) {
 				panic("Config file not found")
 			} else {
-				pathRc = homeDir + "/config.yaml"
+				pathRc = homeDir + "/.yttrc/config.yaml"
 			}
 		} else {
 			pathRc = "config.yaml"

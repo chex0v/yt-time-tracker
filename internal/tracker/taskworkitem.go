@@ -17,8 +17,8 @@ type WorkItems struct {
 }
 
 type Duration struct {
-	Minutes      int    `json:"minutes"`
-	Presentation string `json:"presentation"`
+	Minutes      int    `json:"minutes,omitempty"`
+	Presentation string `json:"presentation,omitempty"`
 }
 
 type WorkItem struct {
@@ -28,10 +28,6 @@ type WorkItem struct {
 	Creator  User     `json:"creator"`
 	Author   User     `json:"author"`
 	Id       string   `json:"id"`
-}
-
-type User struct {
-	Name string `json:"name"`
 }
 
 func (c Client) TaskTackerInfo(taskNumber string) (WorkItems, error) {

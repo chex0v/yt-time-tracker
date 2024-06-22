@@ -8,6 +8,7 @@ import (
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
+	"sort"
 	"time"
 )
 
@@ -42,19 +43,46 @@ func taskInfo(cmd *cobra.Command, args []string) error {
 		log.Fatal(err)
 	}
 	items, err := client.TaskTackerInfo(taskNumber)
-	s.Stop()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	t := tabby.New()
-	t.AddHeader("Id", "Author", "Date", "Duration")
+	s = progressbar.NewProgressBar()
 
-	for _, item := range items.Items {
-		tm := time.Unix(item.Date, 0)
-		t.AddLine(item.Id, item.Author.Name, tm.Format(time.ANSIC), item.Duration.Presentation)
+	t := tabby.New()
+	t.AddHeader("", "")
+	groupByData := GroupByProperty(items.Items, func(i tracker.WorkItem) int64 {
+		return i.Date
+	})
+
+	keys := make([]int64, 0, len(groupByData))
+	for k := range groupByData {
+		keys = append(keys, k)
 	}
+	sort.SliceStable(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+
+	for _, d := range keys {
+		tm := time.Unix(d/1000, 0)
+		t.AddLine("Дата: ", tm.Format(time.DateOnly), "")
+		for _, item := range groupByData[d] {
+			t.AddLine(item.Id, item.Author.Name, item.Duration.Presentation)
+		}
+	}
+	s.Stop()
 	t.Print()
 
 	return nil
+}
+
+func GroupByProperty[T any, K comparable](items []T, getProperty func(T) K) map[K][]T {
+	grouped := make(map[K][]T)
+
+	for _, item := range items {
+		key := getProperty(item)
+		grouped[key] = append(grouped[key], item)
+	}
+
+	return grouped
 }
