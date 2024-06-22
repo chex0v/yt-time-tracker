@@ -30,13 +30,15 @@ func Execute() {
 func addCommands() {
 	cmd := trackingtypes.TrackingTypesCmd
 	reportCmd := report.MyReportByTodayCmd
-	rootCmd.AddCommand(add.AddCmd)
+	addCmd := add.AddCmd
+	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(taskInfo.TaskInfoCmd)
 	rootCmd.AddCommand(trackingtypes.TrackingTypesCmd)
 	rootCmd.AddCommand(user.MyUserInfoCmd)
 	rootCmd.AddCommand(reportCmd)
 	cmd.Flags().StringVarP(&task, "task", "t", "", "Task number")
 	reportCmd.Flags().StringVarP(&date, "date", "d", "", "Date of report. Format YYYY-MM-DD")
+	addCmd.Flags().StringVarP(&task, "date", "d", "", "Date for add. Format YYYY-MM-DD")
 }
 func init() {
 	addCommands()

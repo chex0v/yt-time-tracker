@@ -7,6 +7,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"log"
+	"time"
 )
 
 var AddCmd = &cobra.Command{
@@ -54,6 +55,8 @@ func addTime(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("Argument must be %d", 3)
 	}
 
+	date, _ := cmd.Flags().GetString("date")
+
 	taskNumber := args[0]
 	t := args[1]
 	message := args[2]
@@ -78,6 +81,13 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	create := tracker.WorkItemCreate{Text: message, Duration: tracker.Duration{Presentation: timeValue}, Type: tracker.TypeDuration{Id: typeTask.Id}}
 
+	if date != "" {
+		timeParse, err := time.Parse(time.DateOnly, date)
+		if err != nil {
+			log.Fatal(err)
+		}
+		create.Date = timeParse.UnixMilli()
+	}
 	wItem := tracker.WorkItem{}
 	wItem, err = clientTracker.WorkItemAdd(taskNumber, create)
 

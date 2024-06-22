@@ -21,6 +21,7 @@ type WorkItemCreate struct {
 	Text     string       `json:"text"`
 	Duration Duration     `json:"duration"`
 	Type     TypeDuration `json:"type"`
+	Date     int64        `json:"date,omitempty"`
 }
 
 func (c Client) WorkItemAdd(taskNumber string, taskAdd WorkItemCreate) (WorkItem, error) {
