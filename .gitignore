@@ -22,5 +22,7 @@ go.work
 go.work.sum
 .DS_Store
 *.env
+config.yaml
+.idea
 
 !.env.example
