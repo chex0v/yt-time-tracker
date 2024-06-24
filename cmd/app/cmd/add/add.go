@@ -57,7 +57,7 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	date, _ := cmd.Flags().GetString("date")
 
-	taskNumber := args[0]
+	taskNumber := getTaskNumber(args[0])
 	t := args[1]
 	message := args[2]
 
@@ -97,4 +97,15 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Время добавлено. id: %s", wItem.Id)
 	return nil
+}
+
+func getTaskNumber(taskNumberFromConsole string) string {
+	c := config.GetConfig()
+
+	for _, t := range c.Templates {
+		if t.Key == taskNumberFromConsole {
+			return t.Task
+		}
+	}
+	return taskNumberFromConsole
 }

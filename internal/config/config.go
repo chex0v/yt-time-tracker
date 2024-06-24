@@ -10,8 +10,14 @@ import (
 )
 
 type Config struct {
-	Token  string `yaml:"TOKEN" env:"TOKEN" env-required:"true"`
-	ApiUrl string `yaml:"YT_URL" env:"YT_URL" env-required:"true"`
+	Token     string     `yaml:"TOKEN" env:"TOKEN" env-required:"true"`
+	ApiUrl    string     `yaml:"YT_URL" env:"YT_URL" env-required:"true"`
+	Templates []Template `yaml:"TEMPLATES"`
+}
+
+type Template struct {
+	Key  string `yaml:"key"`
+	Task string `yaml:"task"`
 }
 
 var instance *Config
