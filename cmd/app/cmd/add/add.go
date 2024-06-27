@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"log"
@@ -22,7 +23,7 @@ var AddCmd = &cobra.Command{
 	RunE: addTime,
 }
 
-func viewTaskTypes(types []tracker.WorkItemType) (tracker.WorkItemType, error) {
+func viewTaskTypes(types []workitem.Type) (workitem.Type, error) {
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . | red }}",
@@ -44,7 +45,7 @@ func viewTaskTypes(types []tracker.WorkItemType) (tracker.WorkItemType, error) {
 	indexType, _, err := prompt.Run()
 
 	if err != nil {
-		return tracker.WorkItemType{}, err
+		return workitem.Type{}, err
 	}
 
 	return types[indexType], nil
@@ -63,11 +64,9 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	timeValue := t
 
-	config := config.GetConfig()
+	yt := tracker.NewTracker()
 
-	clientTracker := tracker.NewClient(config.ApiUrl, config.Token)
-
-	types, err := clientTracker.TaskTypesByTask(taskNumber)
+	types, err := yt.TaskTypesByTask(taskNumber)
 
 	if err != nil {
 		log.Fatal(err)
@@ -79,7 +78,7 @@ func addTime(cmd *cobra.Command, args []string) error {
 		log.Fatal(err)
 	}
 
-	create := tracker.WorkItemCreate{Text: message, Duration: tracker.Duration{Presentation: timeValue}, Type: tracker.TypeDuration{Id: typeTask.Id}}
+	create := workitem.Create{Text: message, Duration: workitem.Duration{Presentation: timeValue}, Type: workitem.Type{Id: typeTask.Id}}
 
 	if date != "" {
 		timeParse, err := time.Parse(time.DateOnly, date)
@@ -88,8 +87,8 @@ func addTime(cmd *cobra.Command, args []string) error {
 		}
 		create.Date = timeParse.UnixMilli()
 	}
-	wItem := tracker.WorkItem{}
-	wItem, err = clientTracker.WorkItemAdd(taskNumber, create)
+	wItem := workitem.WorkItem{}
+	wItem, err = yt.WorkItemAdd(taskNumber, create)
 
 	if err != nil {
 		log.Fatal(err)

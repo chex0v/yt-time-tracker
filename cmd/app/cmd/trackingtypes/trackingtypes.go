@@ -1,9 +1,9 @@
 package trackingtypes
 
 import (
-	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
@@ -18,11 +18,9 @@ var TrackingTypesCmd = &cobra.Command{
 	RunE: trackingTypes,
 }
 
-func trackingTypes(cmd *cobra.Command, args []string) error {
+func trackingTypes(cmd *cobra.Command, _ []string) error {
 
-	config := config.GetConfig()
-
-	client := tracker.NewClient(config.ApiUrl, config.Token)
+	yt := tracker.NewTracker()
 	task, err := cmd.Flags().GetString("task")
 
 	if err != nil {
@@ -30,12 +28,12 @@ func trackingTypes(cmd *cobra.Command, args []string) error {
 	}
 	s := progressbar.NewProgressBar()
 	s.Start()
-	var types []tracker.WorkItemType
+	var types []workitem.Type
 
 	if task != "" {
-		types, err = client.TaskTypesByTask(task)
+		types, err = yt.TaskTypesByTask(task)
 	} else {
-		types, err = client.TaskType()
+		types, err = yt.TaskType()
 	}
 
 	s.Stop()
