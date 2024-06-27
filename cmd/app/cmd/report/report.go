@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
-	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
-	"github.com/chex0v/yt-time-tracker/internal/util"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
@@ -46,9 +44,7 @@ func reportByToday(cmd *cobra.Command, _ []string) error {
 
 	t := tabby.New()
 
-	groupByData := util.GroupByProperty(workItems, func(i workitem.WorkItem) int64 {
-		return i.Date
-	})
+	groupByData := workItems.GroupByDate()
 
 	keys := make([]int64, 0, len(groupByData))
 	for k := range groupByData {
