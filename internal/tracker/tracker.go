@@ -29,10 +29,6 @@ type Tracker struct {
 	Client *client.Client
 }
 
-type WorkItems struct {
-	Items []workitem.WorkItem `json:"workItems"`
-}
-
 func NewTracker() Tracker {
 	appConfig := config.GetConfig()
 	c := client.NewClient(appConfig.ApiUrl, appConfig.Token)
@@ -75,7 +71,7 @@ func (t Tracker) MyUserInfo() (user.User, error) {
 	return target, nil
 
 }
-func (t Tracker) MyWorkItemByDate(date string) ([]workitem.WorkItem, error) {
+func (t Tracker) MyWorkItemByDate(date string) (workitem.WorkItems, error) {
 
 	u, err := t.MyUserInfo()
 
@@ -103,11 +99,11 @@ func (t Tracker) MyWorkItemByDate(date string) ([]workitem.WorkItem, error) {
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return []workitem.WorkItem{}, err
+		return workitem.WorkItems{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return []workitem.WorkItem{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return workitem.WorkItems{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	var target []workitem.WorkItem
@@ -115,10 +111,15 @@ func (t Tracker) MyWorkItemByDate(date string) ([]workitem.WorkItem, error) {
 	err = json.Unmarshal(body, &target)
 
 	if err != nil {
-		return []workitem.WorkItem{}, err
+		return workitem.WorkItems{}, err
+	}
+	var workItems workitem.WorkItems
+
+	for _, v := range target {
+		workItems.Items = append(workItems.Items, v)
 	}
 
-	return target, nil
+	return workItems, nil
 }
 func (t Tracker) WorkItemAdd(taskNumber string, taskAdd workitem.Create) (workitem.WorkItem, error) {
 
@@ -272,10 +273,10 @@ func (t Tracker) TaskTypesByTask(taskNumber string) ([]workitem.Type, error) {
 
 	return target, nil
 }
-func (t Tracker) TaskTackerInfo(taskNumber string) (WorkItems, error) {
+func (t Tracker) TaskTackerInfo(taskNumber string) (workitem.WorkItems, error) {
 	res, err := t.Client.Do("GET", "/issues/"+taskNumber+TaskTrackerUrlInfo, nil)
 	if err != nil {
-		return WorkItems{}, err
+		return workitem.WorkItems{}, err
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -286,20 +287,20 @@ func (t Tracker) TaskTackerInfo(taskNumber string) (WorkItems, error) {
 	}(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		return WorkItems{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return workitem.WorkItems{}, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return WorkItems{}, err
+		return workitem.WorkItems{}, err
 	}
 
-	target := WorkItems{}
+	target := workitem.WorkItems{}
 
 	err = json.Unmarshal(body, &target)
 
 	if err != nil {
-		return WorkItems{}, err
+		return workitem.WorkItems{}, err
 	}
 
 	return target, nil
