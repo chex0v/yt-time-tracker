@@ -2,10 +2,10 @@ package report
 
 import (
 	"fmt"
-	taskInfo "github.com/chex0v/yt-time-tracker/cmd/app/cmd/taskinfo"
-	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
+	"github.com/chex0v/yt-time-tracker/internal/util"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
@@ -23,7 +23,7 @@ var MyReportByTodayCmd = &cobra.Command{
 	RunE: reportByToday,
 }
 
-func reportByToday(cmd *cobra.Command, args []string) error {
+func reportByToday(cmd *cobra.Command, _ []string) error {
 	var err error
 	var date string
 
@@ -33,14 +33,11 @@ func reportByToday(cmd *cobra.Command, args []string) error {
 		date = time.Now().Format(time.DateOnly)
 	}
 
-	config := config.GetConfig()
-
-	client := tracker.NewClient(config.ApiUrl, config.Token)
-
+	yt := tracker.NewTracker()
 	s := progressbar.NewProgressBar()
 
 	s.Start()
-	workItems, err := client.MyWorkItemByDate(date)
+	workItems, err := yt.MyWorkItemByDate(date)
 	s.Stop()
 
 	if err != nil {
@@ -49,7 +46,7 @@ func reportByToday(cmd *cobra.Command, args []string) error {
 
 	t := tabby.New()
 
-	groupByData := taskInfo.GroupByProperty(workItems, func(i tracker.WorkItem) int64 {
+	groupByData := util.GroupByProperty(workItems, func(i workitem.WorkItem) int64 {
 		return i.Date
 	})
 

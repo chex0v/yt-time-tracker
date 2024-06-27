@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
 	"github.com/cheynewallace/tabby"
@@ -18,16 +17,12 @@ var MyUserInfoCmd = &cobra.Command{
 	RunE: userInfo,
 }
 
-func userInfo(cmd *cobra.Command, args []string) error {
-
-	config := config.GetConfig()
-
-	client := tracker.NewClient(config.ApiUrl, config.Token)
+func userInfo(*cobra.Command, []string) error {
 
 	s := progressbar.NewProgressBar()
-
+	yt := tracker.NewTracker()
 	s.Start()
-	user, err := client.MyUserInfo()
+	user, err := yt.MyUserInfo()
 	s.Stop()
 
 	if err != nil {

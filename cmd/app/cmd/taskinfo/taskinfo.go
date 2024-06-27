@@ -2,9 +2,10 @@ package taskInfo
 
 import (
 	"fmt"
-	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
+	"github.com/chex0v/yt-time-tracker/internal/util"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
@@ -21,20 +22,18 @@ var TaskInfoCmd = &cobra.Command{
 	RunE: taskInfo,
 }
 
-func taskInfo(cmd *cobra.Command, args []string) error {
+func taskInfo(_ *cobra.Command, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("Argument must be %d", 1)
 	}
 
-	config := config.GetConfig()
-
 	taskNumber := args[0]
 
-	client := tracker.NewClient(config.ApiUrl, config.Token)
+	yt := tracker.NewTracker()
 
 	s := progressbar.NewProgressBar()
 	s.Start()
-	info, err := client.TaskInfo(taskNumber)
+	info, err := yt.TaskInfo(taskNumber)
 	tInfo := tabby.New()
 	tInfo.AddLine(fmt.Sprintf("Id: %s, Project: %s", info.ID, info.Project.Name))
 	tInfo.AddLine()
@@ -42,7 +41,7 @@ func taskInfo(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	items, err := client.TaskTackerInfo(taskNumber)
+	items, err := yt.TaskTackerInfo(taskNumber)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +50,7 @@ func taskInfo(cmd *cobra.Command, args []string) error {
 
 	t := tabby.New()
 	t.AddHeader("", "")
-	groupByData := GroupByProperty(items.Items, func(i tracker.WorkItem) int64 {
+	groupByData := util.GroupByProperty(items.Items, func(i workitem.WorkItem) int64 {
 		return i.Date
 	})
 
@@ -74,15 +73,4 @@ func taskInfo(cmd *cobra.Command, args []string) error {
 	t.Print()
 
 	return nil
-}
-
-func GroupByProperty[T any, K comparable](items []T, getProperty func(T) K) map[K][]T {
-	grouped := make(map[K][]T)
-
-	for _, item := range items {
-		key := getProperty(item)
-		grouped[key] = append(grouped[key], item)
-	}
-
-	return grouped
 }
