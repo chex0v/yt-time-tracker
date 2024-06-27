@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
 	"github.com/cheynewallace/tabby"
 	"github.com/spf13/cobra"
 	"log"
@@ -22,9 +23,7 @@ var MyReportByTodayCmd = &cobra.Command{
 }
 
 func reportByToday(cmd *cobra.Command, _ []string) error {
-	var err error
 	var date string
-
 	date, _ = cmd.Flags().GetString("date")
 
 	if date == "" {
@@ -32,16 +31,20 @@ func reportByToday(cmd *cobra.Command, _ []string) error {
 	}
 
 	yt := tracker.NewTracker()
-	s := progressbar.NewProgressBar()
 
-	s.Start()
-	workItems, err := yt.MyWorkItemByDate(date)
-	s.Stop()
+	_, err := progressbar.Progress(func() (workitem.WorkItems, error) {
+		items, err := yt.MyWorkItemByDate(date)
+		if err != nil {
+			return workitem.WorkItems{}, err
+		}
+		viewWorkItems(items)
+		return items, nil
+	})
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	return err
+}
 
+func viewWorkItems(workItems workitem.WorkItems) {
 	t := tabby.New()
 
 	groupByData := workItems.GroupByDate()
@@ -70,8 +73,5 @@ func reportByToday(cmd *cobra.Command, _ []string) error {
 	}
 	t.AddLine("-------------")
 	t.AddLine("Итого: ", fmt.Sprintf("%.2f часов", d.Hours()))
-	s.Stop()
 	t.Print()
-
-	return nil
 }
