@@ -22,7 +22,7 @@ const (
 	TaskInfoUrl        = "/issues/%s?fields=id,project(id,name)"
 	TaskType           = "/admin/timeTrackingSettings/workItemTypes?fields=id,name,url,autoAttached"
 	TaskTypeByTask     = "/admin/projects/%s/timeTrackingSettings/workItemTypes?fields=id,name,url,autoAttached"
-	TaskTrackerUrlInfo = "/timeTracking?fields=draftWorkItem(id),enabled,workItems(created,duration(presentation,minutes),author(name),creator(name),date,id,text)"
+	TaskTrackerUrlInfo = "/timeTracking?fields=draftWorkItem(id),enabled,workItems(created,duration(presentation,minutes),author(name),creator(name),date,id,text),idReadable"
 )
 
 type Tracker struct {
@@ -81,10 +81,7 @@ func (t Tracker) MyWorkItemByDate(date string) (workitem.WorkItems, error) {
 
 	url := WorkItemsPath + fmt.Sprintf("?startDate=%s&endDate=%s&author=%s&fields=id,author(id,name),creator(id,name),created,date,duration(minutes,presentation),text,issue(id,summary,idReadable)", date, date, u.Id)
 
-	p := progressbar.NewProgressBar()
-	p.Start()
 	res, err := t.Client.Do("GET", url, nil)
-	p.Stop()
 
 	if err != nil {
 		log.Fatal(err)
@@ -298,6 +295,9 @@ func (t Tracker) TaskTackerInfo(taskNumber string) (workitem.WorkItems, error) {
 	target := workitem.WorkItems{}
 
 	err = json.Unmarshal(body, &target)
+	for i := range target.Items {
+		target.Items[i].Issue.IdReadable = taskNumber
+	}
 
 	if err != nil {
 		return workitem.WorkItems{}, err

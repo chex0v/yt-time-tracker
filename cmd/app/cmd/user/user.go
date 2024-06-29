@@ -3,7 +3,8 @@ package user
 import (
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
-	"github.com/cheynewallace/tabby"
+	"github.com/chex0v/yt-time-tracker/internal/tracker/user"
+	view "github.com/chex0v/yt-time-tracker/internal/views/user"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -19,25 +20,13 @@ var MyUserInfoCmd = &cobra.Command{
 
 func userInfo(*cobra.Command, []string) error {
 
-	s := progressbar.NewProgressBar()
-	yt := tracker.NewTracker()
-	s.Start()
-	user, err := yt.MyUserInfo()
-	s.Stop()
-
+	u, err := progressbar.Progress(func() (user.User, error) {
+		return tracker.NewTracker().MyUserInfo()
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	t := tabby.New()
-
-	t.AddLine("ID: ", user.Id)
-	t.AddLine("Email: ", user.Email)
-	t.AddLine("Login: ", user.Login)
-	t.AddLine("Full name: ", user.FullName)
-	t.AddLine("Is online: ", user.Online)
-
-	t.Print()
-
+	view.User(u)
 	return nil
 }
