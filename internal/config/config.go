@@ -51,3 +51,12 @@ func GetConfig() *Config {
 	return instance
 
 }
+
+func (c *Config) TaskNumber(taskNumberFromConsole string) string {
+	for _, t := range c.Templates {
+		if t.Key == taskNumberFromConsole {
+			return t.Task
+		}
+	}
+	return taskNumberFromConsole
+}
