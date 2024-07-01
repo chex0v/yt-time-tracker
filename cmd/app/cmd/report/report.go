@@ -20,16 +20,22 @@ var MyReportByTodayCmd = &cobra.Command{
 
 func reportByToday(cmd *cobra.Command, _ []string) error {
 	var date string
+	var dateTo string
 	date, _ = cmd.Flags().GetString("date")
+	dateTo, _ = cmd.Flags().GetString("date-to")
 
 	if date == "" {
 		date = time.Now().Format(time.DateOnly)
 	}
 
+	if dateTo == "" {
+		dateTo = date
+	}
+
 	yt := tracker.NewTracker()
 
 	items, err := progressbar.Progress(func() (workitem.WorkItems, error) {
-		return yt.MyWorkItemByDate(date)
+		return yt.MyWorkItemByDate(date, dateTo)
 	})
 	if err != nil {
 		return err

@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	task string
-	date string
+	task   string
+	date   string
+	dateDo string
 )
 var rootCmd = &cobra.Command{
 	Use:   "ytt",
@@ -34,6 +35,7 @@ func addCommands() {
 	rootCmd.AddCommand(user.MyUserInfoCmd)
 	rootCmd.AddCommand(reportCmd)
 	reportCmd.Flags().StringVarP(&date, "date", "d", "", "Date of report. Format YYYY-MM-DD")
+	reportCmd.Flags().StringVarP(&dateDo, "date-to", "t", "", "Date end of report. Format YYYY-MM-DD")
 	addCmd.Flags().StringVarP(&task, "date", "d", "", "Date for add. Format YYYY-MM-DD")
 }
 func init() {

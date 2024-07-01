@@ -71,7 +71,7 @@ func (t Tracker) MyUserInfo() (user.User, error) {
 	return target, nil
 
 }
-func (t Tracker) MyWorkItemByDate(date string) (workitem.WorkItems, error) {
+func (t Tracker) MyWorkItemByDate(date, dateTo string) (workitem.WorkItems, error) {
 
 	u, err := t.MyUserInfo()
 
@@ -79,7 +79,7 @@ func (t Tracker) MyWorkItemByDate(date string) (workitem.WorkItems, error) {
 		log.Fatal(err)
 	}
 
-	url := WorkItemsPath + fmt.Sprintf("?startDate=%s&endDate=%s&author=%s&fields=id,author(id,name),creator(id,name),created,date,duration(minutes,presentation),text,issue(id,summary,idReadable)", date, date, u.Id)
+	url := WorkItemsPath + fmt.Sprintf("?startDate=%s&endDate=%s&author=%s&fields=id,author(id,name),creator(id,name),created,date,duration(minutes,presentation),text,issue(id,summary,idReadable)", date, dateTo, u.Id)
 
 	res, err := t.Client.Do("GET", url, nil)
 
