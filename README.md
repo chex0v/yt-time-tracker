@@ -45,6 +45,6 @@ TEMPLATES:
 Теперь можно вызвать команду так
 
 ```bash
-ytt info home
+ytt time home
 ytt add home 1m "test"
 ```
