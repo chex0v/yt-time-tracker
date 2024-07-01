@@ -6,7 +6,6 @@ import (
 	"github.com/chex0v/yt-time-tracker/internal/tracker/user"
 	view "github.com/chex0v/yt-time-tracker/internal/views/user"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 var MyUserInfoCmd = &cobra.Command{
@@ -24,7 +23,7 @@ func userInfo(*cobra.Command, []string) error {
 		return tracker.NewTracker().MyUserInfo()
 	})
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	view.User(u)

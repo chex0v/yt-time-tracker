@@ -31,8 +31,11 @@ func reportByToday(cmd *cobra.Command, _ []string) error {
 	items, err := progressbar.Progress(func() (workitem.WorkItems, error) {
 		return yt.MyWorkItemByDate(date)
 	})
+	if err != nil {
+		return err
+	}
 
 	views.WorkItems(items)
 
-	return err
+	return nil
 }

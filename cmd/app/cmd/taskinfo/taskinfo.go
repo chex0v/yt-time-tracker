@@ -2,6 +2,7 @@ package taskInfo
 
 import (
 	"fmt"
+	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
 	"github.com/chex0v/yt-time-tracker/internal/tracker/issue"
@@ -12,10 +13,10 @@ import (
 )
 
 var TaskInfoCmd = &cobra.Command{
-	Use:   "info [task]",
-	Short: "Узнать информацию о задаче",
+	Use:   "time [task]",
+	Short: "Узнать информацию о зафиксированном времени в задаче",
 	Long: `
-	Получаем информацию о задаче
+	Получаем информацию о зафиксированном времени в задаче
 	`,
 	RunE: taskInfo,
 }
@@ -29,7 +30,8 @@ func taskInfo(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("Argument must be %d", 1)
 	}
 
-	taskNumber := args[0]
+	c := config.GetConfig()
+	taskNumber := c.TaskNumber(args[0])
 
 	task, err = progressbar.Progress(func() (issue.Issue, error) {
 		yt := tracker.NewTracker()

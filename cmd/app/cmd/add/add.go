@@ -9,7 +9,6 @@ import (
 	view "github.com/chex0v/yt-time-tracker/internal/views/issue"
 	views "github.com/chex0v/yt-time-tracker/internal/views/workitem"
 	"github.com/spf13/cobra"
-	"log"
 	"time"
 )
 
@@ -32,6 +31,8 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	var err error
 	var wItem workitem.WorkItem
+	var typeTask workitem.Type
+	var types []workitem.Type
 
 	date, _ := cmd.Flags().GetString("date")
 	config := config2.GetConfig()
@@ -41,18 +42,18 @@ func addTime(cmd *cobra.Command, args []string) error {
 	message := args[2]
 	timeValue := t
 
-	types, err := progressbar.Progress(func() ([]workitem.Type, error) {
+	types, err = progressbar.Progress(func() ([]workitem.Type, error) {
 		return tracker.NewTracker().TaskTypesByTask(taskNumber)
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	typeTask, err := view.ChoiceType(types)
+	typeTask, err = view.ChoiceType(types)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	wItem, err = progressbar.Progress(func() (workitem.WorkItem, error) {
@@ -61,7 +62,7 @@ func addTime(cmd *cobra.Command, args []string) error {
 		if date != "" {
 			timeParse, err := time.Parse(time.DateOnly, date)
 			if err != nil {
-				log.Fatal(err)
+				return workitem.WorkItem{}, err
 			}
 			create.Date = timeParse.UnixMilli()
 		}
@@ -70,7 +71,7 @@ func addTime(cmd *cobra.Command, args []string) error {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	fmt.Println("Время добавлено")
 	views.WorkItem(wItem)
