@@ -1,5 +1,8 @@
 YT_URL=
 TOKEN=
-TEMPLATES:
+TASKS:
   - key: "home"
-    task: "EWHO-27"
+    VALUE: "EWHO-27"
+TYPES:
+  - key: "dev"
+    value:  "116-0"

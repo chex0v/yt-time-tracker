@@ -10,14 +10,20 @@ import (
 )
 
 type Config struct {
-	Token     string     `yaml:"TOKEN" env:"TOKEN" env-required:"true"`
-	ApiUrl    string     `yaml:"YT_URL" env:"YT_URL" env-required:"true"`
-	Templates []Template `yaml:"TEMPLATES"`
+	Token  string `yaml:"TOKEN" env:"TOKEN" env-required:"true"`
+	ApiUrl string `yaml:"YT_URL" env:"YT_URL" env-required:"true"`
+	Tasks  []Task `yaml:"TASKS"`
+	Types  []Type `yaml:"TYPES"`
 }
 
-type Template struct {
+type Task struct {
 	Key  string `yaml:"key"`
-	Task string `yaml:"task"`
+	Task string `yaml:"value"`
+}
+
+type Type struct {
+	Key  string `yaml:"key"`
+	Type string `yaml:"value"`
 }
 
 var instance *Config
@@ -53,10 +59,19 @@ func GetConfig() *Config {
 }
 
 func (c *Config) TaskNumber(taskNumberFromConsole string) string {
-	for _, t := range c.Templates {
+	for _, t := range c.Tasks {
 		if t.Key == taskNumberFromConsole {
 			return t.Task
 		}
 	}
 	return taskNumberFromConsole
+}
+
+func (c *Config) TypeId(codeType string) string {
+	for _, t := range c.Types {
+		if t.Key == codeType {
+			return t.Type
+		}
+	}
+	return ""
 }

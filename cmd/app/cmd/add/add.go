@@ -2,7 +2,7 @@ package add
 
 import (
 	"fmt"
-	config2 "github.com/chex0v/yt-time-tracker/internal/config"
+	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
 	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
@@ -33,27 +33,36 @@ func addTime(cmd *cobra.Command, args []string) error {
 	var wItem workitem.WorkItem
 	var typeTask workitem.Type
 	var types []workitem.Type
+	var strTypeTask string
 
 	date, _ := cmd.Flags().GetString("date")
-	config := config2.GetConfig()
+	strTypeTask, err = cmd.Flags().GetString("type")
 
-	taskNumber := config.TaskNumber(args[0])
+	c := config.GetConfig()
+
+	taskNumber := c.TaskNumber(args[0])
+	strTypeTask = c.TypeId(strTypeTask)
+
 	t := args[1]
 	message := args[2]
 	timeValue := t
 
-	types, err = progressbar.Progress(func() ([]workitem.Type, error) {
-		return tracker.NewTracker().TaskTypesByTask(taskNumber)
-	})
+	if len(strTypeTask) <= 0 {
+		types, err = progressbar.Progress(func() ([]workitem.Type, error) {
+			return tracker.NewTracker().TaskTypesByTask(taskNumber)
+		})
 
-	if err != nil {
-		return err
-	}
+		if err != nil {
+			return err
+		}
 
-	typeTask, err = view.ChoiceType(types)
+		typeTask, err = view.ChoiceType(types)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+	} else {
+		typeTask = workitem.Type{Id: strTypeTask}
 	}
 
 	wItem, err = progressbar.Progress(func() (workitem.WorkItem, error) {
