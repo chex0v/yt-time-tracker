@@ -24,3 +24,8 @@ type WorkItem struct {
 	Text        string      `json:"text,omitempty"`
 	Issue       issue.Issue `json:"issue"`
 }
+
+type ResultCreate struct {
+	WorkItem WorkItem
+	Error    error
+}

@@ -306,3 +306,16 @@ func (t Tracker) TaskTackerInfo(taskNumber string) (workitem.WorkItems, error) {
 	return target, nil
 
 }
+
+func (t Tracker) MassCreation(taskNumbers []string, taskCreate workitem.Create) []workitem.ResultCreate {
+	result := make([]workitem.ResultCreate, len(taskNumbers))
+
+	for _, taskNumber := range taskNumbers {
+		add, err := t.WorkItemAdd(taskNumber, taskCreate)
+		result = append(
+			result,
+			workitem.ResultCreate{WorkItem: add, Error: err},
+		)
+	}
+	return result
+}
