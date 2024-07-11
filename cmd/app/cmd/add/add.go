@@ -6,6 +6,7 @@ import (
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
 	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
+	"github.com/chex0v/yt-time-tracker/internal/util"
 	view "github.com/chex0v/yt-time-tracker/internal/views/issue"
 	views "github.com/chex0v/yt-time-tracker/internal/views/workitem"
 	"github.com/spf13/cobra"
@@ -42,6 +43,10 @@ func addTime(cmd *cobra.Command, args []string) error {
 
 	taskNumber := c.TaskNumber(args[0])
 	strTypeTask = c.TypeId(strTypeTask)
+
+	if date != "" {
+		date = util.GetDynamicDayByMacros(date)
+	}
 
 	t := args[1]
 	message := args[2]

@@ -4,6 +4,7 @@ import (
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
 	"github.com/chex0v/yt-time-tracker/internal/tracker/workitem"
+	"github.com/chex0v/yt-time-tracker/internal/util"
 	views "github.com/chex0v/yt-time-tracker/internal/views/workitem"
 	"github.com/spf13/cobra"
 	"time"
@@ -26,10 +27,14 @@ func reportByToday(cmd *cobra.Command, _ []string) error {
 
 	if date == "" {
 		date = time.Now().Format(time.DateOnly)
+	} else {
+		date = util.GetDynamicDayByMacros(date)
 	}
 
 	if dateTo == "" {
 		dateTo = date
+	} else {
+		dateTo = util.GetDynamicDayByMacros(dateTo)
 	}
 
 	yt := tracker.NewTracker()
