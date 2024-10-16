@@ -3,7 +3,9 @@ package config
 import (
 	"errors"
 	"log"
+	"net/url"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -64,6 +66,16 @@ func (c *Config) TaskNumber(taskNumberFromConsole string) string {
 			return t.Task
 		}
 	}
+	_, err := url.ParseRequestURI(taskNumberFromConsole)
+
+	if err == nil {
+		taskUrl, err := url.Parse(taskNumberFromConsole)
+		if err != nil {
+			log.Fatal(err)
+		}
+		taskNumberFromConsole = strings.Split(taskUrl.Path, "/")[2]
+	}
+
 	return taskNumberFromConsole
 }
 

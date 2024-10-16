@@ -2,6 +2,8 @@ package add
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/chex0v/yt-time-tracker/internal/config"
 	"github.com/chex0v/yt-time-tracker/internal/progressbar"
 	"github.com/chex0v/yt-time-tracker/internal/tracker"
@@ -10,7 +12,6 @@ import (
 	view "github.com/chex0v/yt-time-tracker/internal/views/issue"
 	views "github.com/chex0v/yt-time-tracker/internal/views/workitem"
 	"github.com/spf13/cobra"
-	"time"
 )
 
 var AddCmd = &cobra.Command{
